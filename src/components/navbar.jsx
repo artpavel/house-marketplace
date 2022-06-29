@@ -8,6 +8,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // color choose subject
   const pathMatchRoute = route => {
     if (route === location.pathname) {
       return true;
