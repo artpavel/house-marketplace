@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import {toast} from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { ReactComponent as ArrowRightIcon } from '../assets/svg/keyboardArrowRightIcon.svg';
 import visibilityIcon from '../assets/svg/visibilityIcon.svg';
@@ -40,7 +41,7 @@ const SignUp = () => {
         displayName: name
       });
 
-      // save db
+      // save db firestore
       const user = userCredential.user;
       const formDataCopy = {...formData};
       delete formDataCopy.password;
@@ -51,7 +52,7 @@ const SignUp = () => {
       // redirect
       navigate('/');
     } catch (error) {
-      console.log(error);
+      toast.error('Something went wrong...')
     }
 
   };

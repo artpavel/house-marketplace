@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import {toast} from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { ReactComponent as ArrowRightIcon } from '../assets/svg/keyboardArrowRightIcon.svg';
 import visibilityIcon from '../assets/svg/visibilityIcon.svg';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 
 const SignIn = () => {
@@ -26,7 +28,17 @@ const SignIn = () => {
   const onSubmit = async e => {
     e.preventDefault();
 
-    console.log(formData);
+    try {
+      const auth = getAuth();
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+      // if ok
+      if (userCredential.user) {
+        navigate('/');
+      }
+    } catch (error) {
+      toast.error('Bad User Credentials')
+    }
   };
 
   return (
@@ -76,7 +88,7 @@ const SignIn = () => {
           </div>
         </form>
 
-        {/*Google OAuth*/}
+        {/*Google OAuth*/ }
 
         <Link to="/sign-up" className="registerLink">
           Sign Up Instead
