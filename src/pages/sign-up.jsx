@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { ReactComponent as ArrowRightIcon } from '../assets/svg/keyboardArrowRightIcon.svg';
 import visibilityIcon from '../assets/svg/visibilityIcon.svg';
 import { db } from '../firebase.config';
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import OAuth from '../components/o-auth';
 
 
 const SignUp = () => {
@@ -43,16 +44,16 @@ const SignUp = () => {
 
       // save db firestore
       const user = userCredential.user;
-      const formDataCopy = {...formData};
+      const formDataCopy = { ...formData };
       delete formDataCopy.password;
       formDataCopy.timestamp = serverTimestamp();
 
-      await setDoc(doc(db, 'users', user.uid), formDataCopy)
+      await setDoc(doc(db, 'users', user.uid), formDataCopy);
 
       // redirect
       navigate('/');
     } catch (error) {
-      toast.error('Something went wrong...')
+      toast.error('Something went wrong...');
     }
 
   };
@@ -112,7 +113,7 @@ const SignUp = () => {
           </div>
         </form>
 
-        {/*Google OAuth*/ }
+        <OAuth />
 
         <Link to="/sign-in" className="registerLink">
           Sign In Instead
