@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'
+import 'react-toastify/dist/ReactToastify.css';
 import Explore from './pages/explore';
 import Offers from './pages/offers';
 import SignIn from './pages/sign-in';
@@ -9,6 +9,7 @@ import ForgotPassword from './pages/forgot-password';
 import Navbar from './components/navbar';
 import Profile from './pages/profile';
 import PrivateRoute from './components/private-route';
+import Category from './pages/category';
 
 const App = () => (
   <>
@@ -16,8 +17,9 @@ const App = () => (
       <Routes>
         <Route path="/" element={ <Explore /> } />
         <Route path="/offers" element={ <Offers /> } />
-        <Route path='/profile' element={<PrivateRoute />}>
-          <Route path='/profile' element={<Profile />} />
+        <Route path="/category/:categoryName" element={ <Category /> } />
+        <Route path="/profile" element={ <PrivateRoute /> }>
+          <Route path="/profile" element={ <Profile /> } />
         </Route>
         <Route path="/sign-in" element={ <SignIn /> } />
         <Route path="/sign-up" element={ <SignUp /> } />
