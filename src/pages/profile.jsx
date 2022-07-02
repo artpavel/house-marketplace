@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { getAuth, updateProfile } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase.config';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import arrowRight from '../assets/svg/keyboardArrowRightIcon.svg';
+import homeIcon from '../assets/svg/homeIcon.svg';
 
 const Profile = () => {
   // for work firebase
@@ -98,12 +100,11 @@ const Profile = () => {
           </form>
         </div>
 
-
-        {/*<Link to='/create-listing' className='createListing'>*/ }
-        {/*  <img src={homeIcon} alt='home' />*/ }
-        {/*  <p>Sell or rent your home</p>*/ }
-        {/*  <img src={arrowRight} alt='arrow right' />*/ }
-        {/*</Link>*/ }
+        <Link to="/create-listing" className="createListing">
+          <img src={ homeIcon } alt="home" />
+          <p>Sell or rent your home</p>
+          <img src={ arrowRight } alt="arrow right" />
+        </Link>
 
         {/*{*/ }
         {/*  !loading && listings?.length > 0 && (*/ }

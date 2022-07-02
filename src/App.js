@@ -10,6 +10,7 @@ import Navbar from './components/navbar';
 import Profile from './pages/profile';
 import PrivateRoute from './components/private-route';
 import Category from './pages/category';
+import CreateListing from './pages/create-listing';
 
 const App = () => (
   <>
@@ -24,6 +25,7 @@ const App = () => (
         <Route path="/sign-in" element={ <SignIn /> } />
         <Route path="/sign-up" element={ <SignUp /> } />
         <Route path="/forgot-password" element={ <ForgotPassword /> } />
+        <Route path="/create-listing" element={ <CreateListing /> } />
       </Routes>
       <Navbar />
     </Router>
