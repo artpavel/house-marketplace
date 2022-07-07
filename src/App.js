@@ -12,6 +12,7 @@ import PrivateRoute from './components/private-route';
 import Category from './pages/category';
 import CreateListing from './pages/create-listing';
 import Listing from './pages/listing';
+import Contact from './pages/contact';
 
 const App = () => (
   <>
@@ -31,6 +32,7 @@ const App = () => (
           path='/category/:categoryName/:listingId'
           element={<Listing />}
         />
+        <Route path='/contact/:landlordId' element={<Contact />} />
       </Routes>
       <Navbar />
     </Router>
