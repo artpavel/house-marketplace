@@ -4,9 +4,10 @@ import {
   getStorage,
   ref,
   uploadBytesResumable,
-  getDownloadURL
+  getDownloadURL,
 } from 'firebase/storage';
 import { db } from '../firebase.config';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../components/spinner';
 import { toast } from 'react-toastify';
@@ -27,7 +28,7 @@ const CreateListing = () => {
     discountedPrice: 0,
     images: {},
     latitude: 0,
-    longitude: 0
+    longitude: 0,
   });
 
   const {
@@ -85,10 +86,10 @@ const CreateListing = () => {
     }
 
     // Store images in firebase(storage)
-    const storeImage = async (image) => {
+    const storeImage = async image => {
       return new Promise((resolve, reject) => {
         const storage = getStorage();
-        const fileName = `${ auth.currentUser.uid }-${ image.name }-${ uuidv4() }`;
+        const fileName = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
 
         const storageRef = ref(storage, 'images/' + fileName);
 
@@ -96,7 +97,7 @@ const CreateListing = () => {
 
         uploadTask.on(
           'state_changed',
-          (snapshot) => {
+          snapshot => {
             const progress =
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log('Upload is ' + progress + '% done');
@@ -111,13 +112,13 @@ const CreateListing = () => {
                 break;
             }
           },
-          (error) => {
+          error => {
             reject(error);
           },
           () => {
             // Handle successful uploads on complete
             // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            getDownloadURL(uploadTask.snapshot.ref).then(downloadURL => {
               resolve(downloadURL);
             });
           }
@@ -126,15 +127,26 @@ const CreateListing = () => {
     };
 
     const imgUrls = await Promise.all(
-      [...images].map((image) => storeImage(image))
+      [...images].map(image => storeImage(image))
     ).catch(() => {
       setLoading(false);
       toast.error('Images not uploaded');
     });
 
-    console.log(imgUrls);
+    const formDataCopy = {
+      ...formData,
+      imgUrls,
+      timestamp: serverTimestamp(),
+    };
+
+    delete formDataCopy.images;
+    !formDataCopy.offer && delete formDataCopy.discountedPrice;
+
+    const docRef = await addDoc(collection(db, 'listings'), formDataCopy);
 
     setLoading(false);
+    toast.success('Listing saved');
+    navigate(`/category/${formDataCopy.type}/${docRef.id}`);
   };
 
   if (loading) {
@@ -142,7 +154,7 @@ const CreateListing = () => {
   }
 
   // for input
-  const onMutate = (e) => {
+  const onMutate = e => {
     let boolean = null;
 
     if (e.target.value === 'true') {
@@ -154,7 +166,7 @@ const CreateListing = () => {
 
     // Files
     if (e.target.files) {
-      setFormData((prevState) => ({
+      setFormData(prevState => ({
         ...prevState,
         images: e.target.files,
       }));
@@ -162,93 +174,92 @@ const CreateListing = () => {
 
     // Text/Booleans/Numbers
     if (!e.target.files) {
-      setFormData((prevState) => ({
+      setFormData(prevState => ({
         ...prevState,
         [e.target.id]: boolean ?? e.target.value,
       }));
     }
   };
 
-
   return (
-    <div className="profile">
+    <div className='profile'>
       <header>
-        <p className="pageHeader">Create a Listing</p>
+        <p className='pageHeader'>Create a Listing</p>
       </header>
 
       <main>
-        <form onSubmit={ onSubmit }>
-          <label className="formLabel">Sell / Rent</label>
-          <div className="formButtons">
+        <form onSubmit={onSubmit}>
+          <label className='formLabel'>Sell / Rent</label>
+          <div className='formButtons'>
             <button
-              type="button"
-              className={ type === 'sale' ? 'formButtonActive' : 'formButton' }
-              id="type"
-              value="sale"
-              onClick={ onMutate }
+              type='button'
+              className={type === 'sale' ? 'formButtonActive' : 'formButton'}
+              id='type'
+              value='sale'
+              onClick={onMutate}
             >
               Sell
             </button>
             <button
-              type="button"
-              className={ type === 'rent' ? 'formButtonActive' : 'formButton' }
-              id="type"
-              value="rent"
-              onClick={ onMutate }
+              type='button'
+              className={type === 'rent' ? 'formButtonActive' : 'formButton'}
+              id='type'
+              value='rent'
+              onClick={onMutate}
             >
               Rent
             </button>
           </div>
 
-          <label className="formLabel">Name</label>
+          <label className='formLabel'>Name</label>
           <input
-            className="formInputName"
-            type="text"
-            id="name"
-            value={ name }
-            onChange={ onMutate }
-            maxLength="32"
-            minLength="10"
+            className='formInputName'
+            type='text'
+            id='name'
+            value={name}
+            onChange={onMutate}
+            maxLength='32'
+            minLength='10'
             required
           />
 
-          <div className="formRooms flex">
+          <div className='formRooms flex'>
             <div>
-              <label className="formLabel">Bedrooms</label>
+              <label className='formLabel'>Bedrooms</label>
               <input
-                className="formInputSmall"
-                type="number"
-                id="bedrooms"
-                value={ bedrooms }
-                onChange={ onMutate }
-                min="1"
-                max="50"
+                className='formInputSmall'
+                type='number'
+                id='bedrooms'
+                value={bedrooms}
+                onChange={onMutate}
+                min='1'
+                max='50'
                 required
               />
             </div>
             <div>
-              <label className="formLabel">Bathrooms</label>
+              <label className='formLabel'>Bathrooms</label>
               <input
-                className="formInputSmall"
-                type="number"
-                id="bathrooms"
-                value={ bathrooms }
-                onChange={ onMutate }
-                min="1"
-                max="50"
+                className='formInputSmall'
+                type='number'
+                id='bathrooms'
+                value={bathrooms}
+                onChange={onMutate}
+                min='1'
+                max='50'
                 required
               />
             </div>
           </div>
 
-          <label className="formLabel">Parking spot</label>
-          <div className="formButtons">
+          <label className='formLabel'>Parking spot</label>
+          <div className='formButtons'>
             <button
-              className={ parking ? 'formButtonActive' : 'formButton' }
-              type="button"
-              id="parking"
-              value={ true }
-              onClick={ onMutate }
+              className={parking ? 'formButtonActive' : 'formButton'}
+              type='button'
+              id='parking'
+              value={true}
+              onClick={onMutate}
             >
               Yes
             </button>
@@ -256,23 +267,23 @@ const CreateListing = () => {
               className={
                 !parking && parking !== null ? 'formButtonActive' : 'formButton'
               }
-              type="button"
-              id="parking"
-              value={ false }
-              onClick={ onMutate }
+              type='button'
+              id='parking'
+              value={false}
+              onClick={onMutate}
             >
               No
             </button>
           </div>
 
-          <label className="formLabel">Furnished</label>
-          <div className="formButtons">
+          <label className='formLabel'>Furnished</label>
+          <div className='formButtons'>
             <button
-              className={ furnished ? 'formButtonActive' : 'formButton' }
-              type="button"
-              id="furnished"
-              value={ true }
-              onClick={ onMutate }
+              className={furnished ? 'formButtonActive' : 'formButton'}
+              type='button'
+              id='furnished'
+              value={true}
+              onClick={onMutate}
             >
               Yes
             </button>
@@ -282,32 +293,32 @@ const CreateListing = () => {
                   ? 'formButtonActive'
                   : 'formButton'
               }
-              type="button"
-              id="furnished"
-              value={ false }
-              onClick={ onMutate }
+              type='button'
+              id='furnished'
+              value={false}
+              onClick={onMutate}
             >
               No
             </button>
           </div>
 
-          <label className="formLabel">Address</label>
+          <label className='formLabel'>Address</label>
           <textarea
-            className="formInputAddress"
-            id="address"
-            value={ address }
-            onChange={ onMutate }
+            className='formInputAddress'
+            id='address'
+            value={address}
+            onChange={onMutate}
             required
           />
 
-          <label className="formLabel">Offer</label>
-          <div className="formButtons">
+          <label className='formLabel'>Offer</label>
+          <div className='formButtons'>
             <button
-              className={ offer ? 'formButtonActive' : 'formButton' }
-              type="button"
-              id="offer"
-              value={ true }
-              onClick={ onMutate }
+              className={offer ? 'formButtonActive' : 'formButton'}
+              type='button'
+              id='offer'
+              value={true}
+              onClick={onMutate}
             >
               Yes
             </button>
@@ -315,28 +326,28 @@ const CreateListing = () => {
               className={
                 !offer && offer !== null ? 'formButtonActive' : 'formButton'
               }
-              type="button"
-              id="offer"
-              value={ false }
-              onClick={ onMutate }
+              type='button'
+              id='offer'
+              value={false}
+              onClick={onMutate}
             >
               No
             </button>
           </div>
 
-          <label className="formLabel">Regular Price</label>
-          <div className="formPriceDiv">
+          <label className='formLabel'>Regular Price</label>
+          <div className='formPriceDiv'>
             <input
-              className="formInputSmall"
-              type="number"
-              id="regularPrice"
-              value={ regularPrice }
-              onChange={ onMutate }
-              min="50"
-              max="750000000"
+              className='formInputSmall'
+              type='number'
+              id='regularPrice'
+              value={regularPrice}
+              onChange={onMutate}
+              min='50'
+              max='750000000'
               required
             />
-            { type === 'rent' && <p className="formPriceText">$ / Month</p> }
+            {type === 'rent' && <p className='formPriceText'>$ / Month</p>}
           </div>
 
           {offer && (
@@ -355,21 +366,21 @@ const CreateListing = () => {
             </>
           )}
 
-          <label className="formLabel">Images</label>
-          <p className="imagesInfo">
+          <label className='formLabel'>Images</label>
+          <p className='imagesInfo'>
             The first image will be the cover (max 6).
           </p>
           <input
-            className="formInputFile"
-            type="file"
-            id="images"
-            onChange={ onMutate }
-            max="6"
-            accept=".jpg,.png,.jpeg"
+            className='formInputFile'
+            type='file'
+            id='images'
+            onChange={onMutate}
+            max='6'
+            accept='.jpg,.png,.jpeg'
             multiple
             required
           />
-          <button type="submit" className="primaryButton createListingButton">
+          <button type='submit' className='primaryButton createListingButton'>
             Create Listing
           </button>
         </form>
