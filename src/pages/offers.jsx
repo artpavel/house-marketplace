@@ -29,7 +29,7 @@ const Offers = () => {
           listingsRef,
           where('offer', '==', true),
           orderBy('timestamp', 'desc'),
-          limit(10)
+          limit(2)
         );
 
         // Execute query
@@ -40,7 +40,7 @@ const Offers = () => {
 
         const listings = [];
 
-        querySnap.forEach((doc) => {
+        querySnap.forEach(doc => {
           return listings.push({
             id: doc.id,
             data: doc.data(),
@@ -54,7 +54,7 @@ const Offers = () => {
       }
     };
 
-    fetchListings().then();
+    fetchListings();
   }, []);
 
   // Pagination / Load More
@@ -80,14 +80,14 @@ const Offers = () => {
 
       const listings = [];
 
-      querySnap.forEach((doc) => {
+      querySnap.forEach(doc => {
         return listings.push({
           id: doc.id,
           data: doc.data(),
         });
       });
 
-      setListings((prevState) => [...prevState, ...listings]);
+      setListings(prevState => [...prevState, ...listings]);
       setLoading(false);
     } catch (error) {
       toast.error('Could not fetch listings');
@@ -95,42 +95,38 @@ const Offers = () => {
   };
 
   return (
-    <div className="category">
+    <div className='category'>
       <header>
-        <p className="pageHeader">Offers</p>
+        <p className='pageHeader'>Offers</p>
       </header>
 
-      {
-        loading
-          ? <Spinner />
-          : listings && listings.length > 0
-            ? <>
-              <main>
-                <ul className="categoryListings">
-                  {
-                    listings.map(listing => (
-                      <ListingItem
-                        listing={ listing.data }
-                        id={ listing.id }
-                        key={ listing.id }
-                      />
-                    ))
-                  }
-                </ul>
-              </main>
+      {loading ? (
+        <Spinner />
+      ) : listings && listings.length > 0 ? (
+        <>
+          <main>
+            <ul className='categoryListings'>
+              {listings.map(listing => (
+                <ListingItem
+                  listing={listing.data}
+                  id={listing.id}
+                  key={listing.id}
+                />
+              ))}
+            </ul>
+          </main>
 
-              <br />
-              <br />
-              {
-                lastFetchedListing && (
-                  <p className="loadMore" onClick={ onFetchMoreListings }>
-                    Load More
-                  </p>
-                )
-              }
-            </>
-            : <p>There are no current offers</p>
-      }
+          <br />
+          <br />
+          {lastFetchedListing && (
+            <p className='loadMore' onClick={onFetchMoreListings}>
+              Load More
+            </p>
+          )}
+        </>
+      ) : (
+        <p>There are no current offers</p>
+      )}
     </div>
   );
 };

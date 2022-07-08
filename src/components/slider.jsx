@@ -5,7 +5,7 @@ import { db } from '../firebase.config';
 import SwiperCore, { Navigation, Pagination, Scrollbar, A11y } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
-import Spinner from './Spinner';
+import Spinner from './spinner';
 SwiperCore.use([Navigation, Pagination, Scrollbar, A11y]);
 
 const Slider = () => {
